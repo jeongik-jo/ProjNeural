@@ -41,23 +41,26 @@ for M in Ms:
         return f_relu(M / (2 * np.sqrt(d) * A) * (x - y) + 1) - 2 * f_relu(M / (2 * np.sqrt(d) * A) * (x - y)) + \
                f_relu(M / (2 * np.sqrt(d) * A) * (x - y) - 1)
 
+    b = np.random.uniform(-1, 1, size=[r, d])
+
     for l in np.arange(1, r + 1):
-        for j in product(np.arange(0, N + 1), repeat=d):
+        for k in np.arange(1, M + 1):
+            for j in product(np.arange(0, N + 1), repeat=d):
 
-            def f_bottom_up(x, bottom, up):
-                if up in np.arange(0, s):
-                    if bottom in np.arange(1, 2 ** up + 1):
-                        return f_mult(f_bottom_up(x, 2 * bottom - 1, up + 1), f_bottom_up(x, 2 * bottom, up + 1))
-                if up == s:
-                    for t in np.arange(1, d + 1):
-                        if np.sum(j[:t-1]) + 1 <= bottom <= np.sum(j[:t]):
-                            return f_id(f_id(x[t+1]))
+                def f_bottom_up(x, bottom, up):
+                    if up in np.arange(0, s):
+                        if bottom in np.arange(1, 2 ** up + 1):
+                            return f_mult(f_bottom_up(x, 2 * bottom - 1, up + 1), f_bottom_up(x, 2 * bottom, up + 1))
+                    if up == s:
+                        for t in np.arange(1, d + 1):
+                            if np.sum(j[:t-1]) + 1 <= bottom <= np.sum(j[:t]):
+                                return f_id(f_id(x[:, t - 1]))
 
-                    if bottom == np.sum(j) + 1:
-                        return f_hat(b_lt @ x, u[bottom - 1])
-                    if bottom in np.arange(np.sum(j) + 2, 2 ** s + 1):
-                        return 1
+                        if bottom == np.sum(j) + 1:
+                            return f_hat(np.sum(b[l - 1][np.newaxis] * x, axis=-1), u[k - 1])
+                        if bottom in np.arange(np.sum(j) + 2, 2 ** s + 1):
+                            return np.ones(shape=[x.shape[0]])
 
-                raise AssertionError
+                    raise AssertionError
 
-            f_bottom_up(x, 1, 0)
+                print(f_bottom_up(np.random.uniform(-1, 1, size=[3, d]), 1, 0))
