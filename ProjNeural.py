@@ -33,6 +33,10 @@ def f_relu(x):
     return f_mult(f_id(x), sigmoid(R * x))
 
 
+n = 100
+X = np.random.uniform(-1, 1, size=[n, d]) * 0.9
+Y = np.random.uniform(-1, 1, size=[n]) * 0.9
+
 for M in Ms:
     J = r * (M + 1) * math.comb(N + d, d)
     u = -np.sqrt(d) * A + np.arange(0, M + 1) * 2 * np.sqrt(d) * A / M
@@ -42,9 +46,9 @@ for M in Ms:
                f_relu(M / (2 * np.sqrt(d) * A) * (x - y) - 1)
 
     b = np.random.uniform(-1, 1, size=[r, d])
-
+    B = []
     for l in np.arange(1, r + 1):
-        for k in np.arange(1, M + 1):
+        for k in np.arange(1, M + 2):
             for j in product(np.arange(0, N + 1), repeat=d):
 
                 def f_bottom_up(x, bottom, up):
@@ -63,4 +67,9 @@ for M in Ms:
 
                     raise AssertionError
 
-                print(f_bottom_up(np.random.uniform(-1, 1, size=[3, d]), 1, 0))
+                #print(f_bottom_up(np.random.uniform(-1, 1, size=[3, d]), 1, 0))
+                if 0 <= np.sum(j) <= N:
+                    B.append(f_bottom_up(X, 1, 0))
+    B = np.array(B).T
+    a = np.linalg.inv(B.T @ B + 1) @ (B.T @ Y)
+    print('loss:', np.sum(np.square(B @ a - Y)))
