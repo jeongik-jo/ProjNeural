@@ -11,8 +11,8 @@ is_m4 = True
 
 if is_m1:
     def m(X):
-        return np.log(np.abs(0.2 * X[:, 0] + 0.9 * X[:, 1])) + \
-               np.cos(np.pi / np.log(np.abs(0.5 * X[:, 0] + 0.3 * X[:, 1]))) +\
+        return np.log((0.2 * X[:, 0] + 0.9 * X[:, 1]) ** 2) + \
+               np.cos(np.pi / np.log((0.5 * X[:, 0] + 0.3 * X[:, 1]) ** 2)) +\
                np.exp(1/50 * (0.7 * X[:, 0] + 0.7 * X[:, 1])) +\
                np.tan(np.pi * (0.1 * X[:, 0] + 0.3 * X[:, 1]) ** 4) / (0.1 * X[:, 0] + 0.3 * X[:, 1]) ** 2
     input_dim = 2 # d
