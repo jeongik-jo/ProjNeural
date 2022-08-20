@@ -10,7 +10,7 @@ A = 1
 N = 2
 R = 10**6
 r = 4
-Ms = [2, 4, 6, 8]
+Ms = [2, 4, 6, 16]
 
 I_n = 400
 d = hp.input_dim
@@ -72,4 +72,5 @@ for M in Ms:
                     B.append(f_down_up(X_train, 1, 0))
     B = np.array(B).T
     a = np.linalg.inv(B.T @ B + c_3) @ (B.T @ y_train)
+    print(np.max(a))
     print('loss:', np.mean(np.square(B @ a - y_train)))
