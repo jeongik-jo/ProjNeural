@@ -5,9 +5,9 @@ test_data_size = 10000
 noise_strength = 0.05
 
 is_m1 = False
-is_m2 = False
+is_m2 = True
 is_m3 = False
-is_m4 = True
+is_m4 = False
 
 if is_m1:
     def m(X):
