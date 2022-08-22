@@ -9,7 +9,7 @@ A = 1
 N = 2
 R = 10**6
 r = 4
-Ms = [2]
+Ms = [2, 4, 8, 16]
 
 I_n = 1
 d = hp.input_dim
@@ -40,6 +40,7 @@ def f_relu(x):
 for M in Ms:
     min_loss = np.inf
     for _ in range(I_n):
+        # J = r * (M + 1) * math.comb(N + d, d)
         u = -np.sqrt(d) * A + np.arange(0, M + 1) * 2 * np.sqrt(d) * A / M
 
         def f_hat(x, y):
@@ -69,7 +70,6 @@ for M in Ms:
                         B.append(f_down_up(X_train, 1, 0))
         B = np.array(B).T
         a = np.linalg.inv(B.T @ B + c_3) @ (B.T @ y_train)
-        print(np.max(a))
         loss = np.mean(np.square(B @ a - y_train))
         print('loss:', loss)
 
