@@ -36,13 +36,10 @@ def f_relu(x):
 
 
 (X_train, y_train), (X_test, y_test) = Dataset.load_dataset()
-#X_train = np.random.uniform(-1, 1, size=[100, d])
-#y_train = np.mean(X_train, axis=-1)
 
 for M in Ms:
     min_loss = np.inf
     for _ in range(I_n):
-        #J = r * (M + 1) * math.comb(N + d, d)
         u = -np.sqrt(d) * A + np.arange(0, M + 1) * 2 * np.sqrt(d) * A / M
 
         def f_hat(x, y):
