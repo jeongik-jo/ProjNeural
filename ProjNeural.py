@@ -9,9 +9,9 @@ A = 1
 N = 2
 R = 10**6
 r = 4
-Ms = [2, 4, 8, 16]
+Ms = [2]
 
-I_n = 1
+I_n = 50
 d = hp.input_dim
 s = np.ceil(np.log2(N + 1)) # 2
 c_3 = 1
@@ -37,16 +37,17 @@ def f_relu(x):
 
 (X_train, y_train), (X_test, y_test) = Dataset.load_dataset()
 
+min_loss = np.inf
 for M in Ms:
-    min_loss = np.inf
+    # J = r * (M + 1) * math.comb(N + d, d)
+    u = -np.sqrt(d) * A + np.arange(0, M + 1) * 2 * np.sqrt(d) * A / M
+
+    def f_hat(x, y):
+        return f_relu(M / (2 * np.sqrt(d) * A) * (x - y) + 1) - 2 * f_relu(M / (2 * np.sqrt(d) * A) * (x - y)) + \
+               f_relu(M / (2 * np.sqrt(d) * A) * (x - y) - 1)
+
+
     for _ in range(I_n):
-        # J = r * (M + 1) * math.comb(N + d, d)
-        u = -np.sqrt(d) * A + np.arange(0, M + 1) * 2 * np.sqrt(d) * A / M
-
-        def f_hat(x, y):
-            return f_relu(M / (2 * np.sqrt(d) * A) * (x - y) + 1) - 2 * f_relu(M / (2 * np.sqrt(d) * A) * (x - y)) + \
-                   f_relu(M / (2 * np.sqrt(d) * A) * (x - y) - 1)
-
         b = np.random.uniform(-1, 1, size=[r, d])
         B = []
         for l in np.arange(1, r + 1):
@@ -76,4 +77,4 @@ for M in Ms:
         if loss < min_loss:
             min_loss = loss
 
-    print('min loss:', min_loss)
+print('min loss:', min_loss)
