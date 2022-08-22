@@ -3,7 +3,6 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import numpy as np
 import HyperParameters as hp
 from itertools import product
-import math
 import Dataset
 
 A = 1
@@ -51,7 +50,6 @@ for M in Ms:
                    f_relu(M / (2 * np.sqrt(d) * A) * (x - y) - 1)
 
         b = np.random.uniform(-1, 1, size=[r, d])
-        b = b / (np.sqrt(np.sum(np.square(b), axis=-1, keepdims=True)) + 1e-8)
         B = []
         for l in np.arange(1, r + 1):
             for k in np.arange(1, M + 2):
