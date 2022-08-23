@@ -8,10 +8,10 @@ R = 10 ** 6
 r = 4
 Ms = [2, 4, 8, 16]
 
-I_n = 50
+I_n = 400
 d = Dataset.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
-c_3 = 1000
+c_3 = 10000
 
 
 def sigmoid(x):
