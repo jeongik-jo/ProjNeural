@@ -47,3 +47,4 @@ knn_neighbor_sizes = [1, 2, 3, 4, 8, 12, 16, 20]
 fc_depth_size = 3
 fc_unit_sizes = [3, 6, 9, 12, 15]
 epoch = 100000
+

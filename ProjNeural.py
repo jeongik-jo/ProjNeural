@@ -1,5 +1,4 @@
 import os
-
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import numpy as np
 import HyperParameters as hp
@@ -13,10 +12,10 @@ R = 10 ** 6
 r = 4
 Ms = [2, 4, 8, 16]
 
-I_n = 100
+I_n = 50
 d = hp.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
-c_3 = 1000
+c_3 = 100
 
 
 def sigmoid(x):
@@ -59,7 +58,6 @@ def get_B(X, M, b):
                             return f_hat(x @ b[l - 1], u[k - 1])
                         if np.sum(j) + 2 <= down <= 2 ** s:
                             return np.ones(shape=[x.shape[0]])
-                        raise AssertionError
                     raise AssertionError
 
                 if 0 <= np.sum(j) <= N:
@@ -75,6 +73,9 @@ def train(X_train, y_train):
     min_a = None
     min_b = None
 
+    success = 0
+    fail = 0
+
     for M in Ms:
         for _ in range(I_n):
             b = np.random.uniform(-1, 1, size=[r, d])
@@ -87,10 +88,11 @@ def train(X_train, y_train):
                     min_M = M
                     min_a = a
                     min_b = b
-
+                success += 1
             except np.linalg.LinAlgError:
-                print('Singular matrix')
-
+                fail += 1
+    print("train loss :", min_loss)
+    print('fail rate :', fail / (success + fail))
     return min_M, min_a, min_b
 
 
@@ -103,6 +105,7 @@ def main():
     (X_train, y_train), (X_test, y_test) = Dataset.load_dataset()
 
     M, a, b = train(X_train, y_train)
+    print('M:', M)
     losses = evaluate(X_test, y_test, M, a, b)
 
     print('mean loss :', np.mean(losses))
