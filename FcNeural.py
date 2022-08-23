@@ -4,7 +4,6 @@ import tensorflow as tf
 import tensorflow.keras as kr
 import Dataset
 import numpy as np
-from scipy.stats import iqr
 
 
 depth = 3
@@ -63,9 +62,7 @@ def test(model, X_test, y_test):
     y_test = tf.cast(y_test, 'float32')
 
     losses = tf.square(model(X_test) - y_test)
-    print('\nmse:\t', np.mean(losses))
-    print('median:\t', np.median(losses))
-    print("iqr:\t", iqr(losses))
+    print('\ntest loss:\t', np.mean(losses))
 
 
 def main():

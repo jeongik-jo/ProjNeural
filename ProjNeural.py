@@ -1,7 +1,6 @@
 import numpy as np
 from itertools import product
 import Dataset
-from scipy.stats import iqr
 
 A = 1
 N = 2
@@ -92,25 +91,22 @@ def train(X_train, y_train, X_valid, y_valid):
                 min_b = b
 
     print("valid mse loss :", min_loss)
+    print('min M :', min_M)
     print('fail rate :', fail / (success + fail))
     return min_M, min_a, min_b
 
 
 def test(X_test, y_test, M, a, b):
     B = get_B(X_test, M, b)
-    return np.square(B @ a - y_test)
+    losses = np.square(B @ a - y_test)
+    print('\ntest loss:\t', np.mean(losses))
 
 
 def main():
     (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = Dataset.load_dataset()
 
     M, a, b = train(X_train, y_train, X_valid, y_valid)
-    print('M:', M)
-    losses = test(X_test, y_test, M, a, b)
-
-    print('mse loss :', np.mean(losses))
-    print('median loss :', np.median(losses))
-    print('iqr :', iqr(losses))
+    test(X_test, y_test, M, a, b)
 
 
 main()

@@ -1,7 +1,6 @@
 from sklearn.neighbors import KNeighborsRegressor
 import numpy as np
 import Dataset
-from scipy.stats import iqr
 
 
 neighbor_sizes = [1, 2, 3, 4, 8, 12, 16, 20]
@@ -30,9 +29,7 @@ def train(X_train, y_train, X_valid, y_valid):
 
 def test(model, X_test, y_test):
     losses = np.square(model.predict(X_test) - y_test)
-    print('\nmse:\t', np.mean(losses))
-    print('median:\t', np.median(losses))
-    print("iqr:\t", iqr(losses))
+    print('\ntest loss:\t', np.mean(losses))
 
 
 def main():
