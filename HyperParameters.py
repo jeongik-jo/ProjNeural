@@ -1,7 +1,9 @@
 import numpy as np
 
-train_data_size = 100
+train_data_size = 80
+valid_data_size = 20
 test_data_size = 10000
+
 noise_strength = 0.05
 
 is_m1 = False

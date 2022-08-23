@@ -15,7 +15,7 @@ Ms = [2, 4, 8, 16]
 I_n = 50
 d = hp.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
-c_3 = 100
+c_3 = 1000
 
 
 def sigmoid(x):
@@ -67,7 +67,7 @@ def get_B(X, M, b):
     return B
 
 
-def train(X_train, y_train):
+def train(X_train, y_train, X_valid, y_valid):
     min_loss = np.inf
     min_M = None
     min_a = None
@@ -82,16 +82,19 @@ def train(X_train, y_train):
             B = get_B(X_train, M, b)
             try:
                 a = np.linalg.inv(B.T @ B + c_3) @ (B.T @ y_train)
-                loss = np.mean(np.square(B @ a - y_train))
-                if loss < min_loss:
-                    min_loss = loss
-                    min_M = M
-                    min_a = a
-                    min_b = b
                 success += 1
             except np.linalg.LinAlgError:
                 fail += 1
-    print("train loss :", min_loss)
+                continue
+
+            loss = np.mean(np.square(get_B(X_valid, M, b) @ a - y_valid))
+            if loss < min_loss:
+                min_loss = loss
+                min_M = M
+                min_a = a
+                min_b = b
+
+    print("valid loss :", min_loss)
     print('fail rate :', fail / (success + fail))
     return min_M, min_a, min_b
 
@@ -102,9 +105,9 @@ def evaluate(X_test, y_test, M, a, b):
 
 
 def main():
-    (X_train, y_train), (X_test, y_test) = Dataset.load_dataset()
+    (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = Dataset.load_dataset()
 
-    M, a, b = train(X_train, y_train)
+    M, a, b = train(X_train, y_train, X_valid, y_valid)
     print('M:', M)
     losses = evaluate(X_test, y_test, M, a, b)
 
