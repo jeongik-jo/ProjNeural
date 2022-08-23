@@ -2,92 +2,76 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 import tensorflow.keras as kr
-import HyperParameters as hp
 import Dataset
 import numpy as np
 from scipy.stats import iqr
 
-"""
-class EqDense(kr.layers.Layer):
-    def __init__(self, units, activation=kr.activations.linear, use_bias=True):
-        super(EqDense, self).__init__()
-        self.units = units
-        self.activation = activation
-        self.use_bias = use_bias
 
-    def build(self, input_shape):
-        self.w = tf.Variable(tf.random.normal([input_shape[-1], self.units]), name=self.name + '_w')
-        self.he_std = tf.sqrt(1.0 / tf.cast(input_shape[-1], 'float32'))
-
-        if self.use_bias:
-            self.b = tf.Variable(tf.zeros([1, self.units]), name=self.name + '_b')
-
-    def call(self, inputs, *args, **kwargs):
-        feature_vector = tf.matmul(inputs, self.w) * self.he_std
-        if self.use_bias:
-            feature_vector = feature_vector + self.b
-
-        return self.activation(feature_vector)
+depth = 3
+learning_rate = 1e-3
+unit_sizes = [3, 6, 9, 12, 15]
+epoch = 100000
 
 
-def build_model(units, depth):
-    model_output = model_input = kr.Input([hp.input_dim])
-    for _ in range(depth):
-        model_output = EqDense(units=units, activation=tf.nn.leaky_relu)(model_output)
-    model_output = tf.squeeze(EqDense(units=1)(model_output))
-    return kr.Model(model_input, model_output)
-"""
-
-def build_model(units, depth):
-    model_output = model_input = kr.Input([hp.input_dim])
+def build_model(units):
+    model_output = model_input = kr.Input([Dataset.input_dim])
     for _ in range(depth):
         model_output = kr.layers.Dense(units=units, activation=tf.nn.leaky_relu)(model_output)
     model_output = tf.squeeze(kr.layers.Dense(units=1)(model_output))
     return kr.Model(model_input, model_output)
 
 
-def evaluate(X_train, y_train, X_test, y_test):
+def train(X_train, y_train, X_valid, y_valid):
     X_train = tf.cast(X_train, 'float32')
     y_train = tf.cast(y_train, 'float32')
-    X_test = tf.cast(X_test, 'float32')
-    y_test = tf.cast(y_test, 'float32')
+    X_valid = tf.cast(X_valid, 'float32')
+    y_valid = tf.cast(y_valid, 'float32')
 
-    unit_sizes = []
-    mean_l2_errors = []
-    median_l2_errors = []
-    l2_iqrs = []
+    min_loss = np.inf
+    min_model = None
+    min_units = None
 
-    for unit_size in hp.fc_unit_sizes:
-        model = build_model(units=unit_size, depth=hp.fc_depth_size)
-        optimizer = kr.optimizers.SGD(learning_rate=1e-3)
-
+    for units in unit_sizes:
         @tf.function
-        def train(model, optimizer, X_train, y_train):
+        def train_step(model, optimizer, X_train, y_train):
             with tf.GradientTape() as tape:
                 y_pred = model(X_train)
                 loss = tf.reduce_mean(tf.square(y_pred - y_train))
             optimizer.apply_gradients(
                 zip(tape.gradient(loss, model.trainable_variables),
-                    model.trainable_variables)
-            )
+                    model.trainable_variables))
 
-        for _ in range(hp.epoch):
-            train(model, optimizer, X_train, y_train)
-        l2_errors = tf.square(model(X_test) - y_test)
+        model = build_model(units)
+        optimizer = kr.optimizers.SGD(learning_rate=learning_rate)
+        for _ in range(epoch):
+            train_step(model, optimizer, X_train, y_train)
 
-        unit_sizes.append(unit_size)
-        mean_l2_errors.append(np.mean(l2_errors))
-        median_l2_errors.append(np.median(l2_errors))
-        l2_iqrs.append(iqr(l2_errors))
+        loss = tf.reduce_mean(tf.square(model(X_valid) - y_valid))
 
-    i = np.argmin(median_l2_errors)
-    print('unit size :', unit_sizes[i])
-    print('median l2 :', median_l2_errors[i])
-    print('mean l2 :', np.array(mean_l2_errors[i]))
-    print('iqr :', l2_iqrs[i])
+        if loss < min_loss:
+            min_loss = loss
+            min_model = model
+            min_units = units
+    print('valid loss:', min_loss.numpy())
+    print('units:', min_units)
+
+    return min_model
+
+
+def test(model, X_test, y_test):
+    X_test = tf.cast(X_test, 'float32')
+    y_test = tf.cast(y_test, 'float32')
+
+    losses = tf.square(model(X_test) - y_test)
+    print('\nmse:\t', np.mean(losses))
+    print('median:\t', np.median(losses))
+    print("iqr:\t", iqr(losses))
 
 
 def main():
-    (X_train, y_train), (X_test, y_test) = Dataset.load_dataset()
-    evaluate(X_train, y_train, X_test, y_test)
+    (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = Dataset.load_dataset()
+    model = train(X_train, y_train, X_valid, y_valid)
+    test(model, X_test, y_test)
+
+
 main()

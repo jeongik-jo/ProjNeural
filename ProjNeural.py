@@ -1,7 +1,4 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import numpy as np
-import HyperParameters as hp
 from itertools import product
 import Dataset
 from scipy.stats import iqr
@@ -13,7 +10,7 @@ r = 4
 Ms = [2, 4, 8, 16]
 
 I_n = 50
-d = hp.input_dim
+d = Dataset.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
 c_3 = 1000
 
@@ -94,12 +91,12 @@ def train(X_train, y_train, X_valid, y_valid):
                 min_a = a
                 min_b = b
 
-    print("valid loss :", min_loss)
+    print("valid mse loss :", min_loss)
     print('fail rate :', fail / (success + fail))
     return min_M, min_a, min_b
 
 
-def evaluate(X_test, y_test, M, a, b):
+def test(X_test, y_test, M, a, b):
     B = get_B(X_test, M, b)
     return np.square(B @ a - y_test)
 
@@ -109,9 +106,9 @@ def main():
 
     M, a, b = train(X_train, y_train, X_valid, y_valid)
     print('M:', M)
-    losses = evaluate(X_test, y_test, M, a, b)
+    losses = test(X_test, y_test, M, a, b)
 
-    print('mean loss :', np.mean(losses))
+    print('mse loss :', np.mean(losses))
     print('median loss :', np.median(losses))
     print('iqr :', iqr(losses))
 

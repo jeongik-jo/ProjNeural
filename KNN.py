@@ -1,34 +1,43 @@
 from sklearn.neighbors import KNeighborsRegressor
-import HyperParameters as hp
 import numpy as np
 import Dataset
 from scipy.stats import iqr
 
 
-def evaluate(X_train, y_train, X_test, y_test):
-    n_neighbors_sizes = []
-    mean_l2_errors = []
-    median_l2_errors = []
-    l2_iqrs = []
+neighbor_sizes = [1, 2, 3, 4, 8, 12, 16, 20]
 
-    for n_neighbors in hp.knn_neighbor_sizes:
+
+def train(X_train, y_train, X_valid, y_valid):
+    min_loss = np.inf
+    min_model = None
+    min_n_neighbors = None
+
+    for n_neighbors in neighbor_sizes:
         model = KNeighborsRegressor(n_neighbors=n_neighbors)
         model.fit(X_train, y_train)
-        l2_errors = np.square(model.predict(X_test) - y_test)
+        loss = np.mean(np.square(model.predict(X_valid) - y_valid))
 
-        n_neighbors_sizes.append(n_neighbors)
-        mean_l2_errors.append(np.mean(l2_errors))
-        median_l2_errors.append(np.median(l2_errors))
-        l2_iqrs.append(iqr(l2_errors))
+        if loss < min_loss:
+            min_loss = loss
+            min_model = model
+            min_n_neighbors = n_neighbors
 
-    i = np.argmin(median_l2_errors)
-    print('n neighbors :', n_neighbors_sizes[i])
-    print('min mean l2 :', mean_l2_errors[i])
-    print('min median l2 :', median_l2_errors[i])
-    print("iqr :", l2_iqrs[i])
+    print('valid loss:', min_loss)
+    print('neighbors:', min_n_neighbors)
+
+    return min_model
+
+
+def test(model, X_test, y_test):
+    losses = np.square(model.predict(X_test) - y_test)
+    print('\nmse:\t', np.mean(losses))
+    print('median:\t', np.median(losses))
+    print("iqr:\t", iqr(losses))
 
 
 def main():
-    (X_train, y_train), (X_test, y_test) = Dataset.load_dataset()
-    evaluate(X_train, y_train, X_test, y_test)
+    (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = Dataset.load_dataset()
+    model = train(X_train, y_train, X_valid, y_valid)
+    test(model, X_test, y_test)
+
 main()
