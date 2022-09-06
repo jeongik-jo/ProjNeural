@@ -4,7 +4,7 @@ train_data_size = 80
 valid_data_size = 20
 test_data_size = 10000
 
-noise_strength = 0.05
+noise_strength = 0.0
 
 is_m1 = False
 is_m2 = True
@@ -47,10 +47,10 @@ def load_dataset():
     X_train = np.random.uniform(-1, 1, size=[train_data_size, input_dim])
     y_train = m(X_train) + noise_strength * noise_scale * np.random.normal(size=[train_data_size])
 
-    X_valid = np.random.uniform(-1, 1, size=[valid_data_size, input_dim])
-    y_valid = m(X_valid) + noise_strength * noise_scale * np.random.normal(size=[valid_data_size])
+    X_test = np.random.uniform(-1, 1, size=[valid_data_size, input_dim])
+    y_test = m(X_test) + noise_strength * noise_scale * np.random.normal(size=[valid_data_size])
 
-    X_test = np.random.uniform(-1, 1, size=[test_data_size, input_dim])
-    y_test = m(X_test)
+    X_valid = np.random.uniform(-1, 1, size=[test_data_size, input_dim])
+    y_valid = m(X_valid)
 
-    return (X_train, y_train), (X_valid, y_valid), (X_test, y_test)
+    return (X_train, y_train), (X_test, y_test), (X_valid, y_valid)

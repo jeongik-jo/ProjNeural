@@ -11,7 +11,7 @@ Ms = [2, 4, 8, 16]
 I_n = 400
 d = Dataset.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
-c_3 = 10000
+c_3 = 1
 
 
 def sigmoid(x):
@@ -63,50 +63,57 @@ def get_B(X, M, b):
     return B
 
 
-def train(X_train, y_train, X_valid, y_valid):
+def predict(X, M, a, b):
+    return get_B(X, M, b) @ a
+
+
+def train_step(X_train, y_train, M, prev_loss, prev_a, prev_b):
+    b = np.random.uniform(-1, 1, size=[r, d])
+    B = get_B(X_train, M, b)
+    a = np.linalg.inv(B.T @ B + np.eye(B.shape[1]) * c_3) @ (B.T @ y_train)
+
+    loss = np.mean(np.square(predict(X_train, M, a, b) - y_train))
+
+    if loss < prev_loss:
+        return loss, a, b
+    else:
+        return prev_loss, prev_a, prev_b
+
+
+def train(X_train, y_train, X_test, y_test):
     min_loss = np.inf
-    min_M = None
     min_a = None
     min_b = None
-
-    success = 0
-    fail = 0
+    min_M = None
 
     for M in Ms:
+        train_loss = np.inf
+        a = None
+        b = None
         for _ in range(I_n):
-            b = np.random.uniform(-1, 1, size=[r, d])
-            B = get_B(X_train, M, b)
-            try:
-                a = np.linalg.inv(B.T @ B + c_3) @ (B.T @ y_train)
-                success += 1
-            except np.linalg.LinAlgError:
-                fail += 1
-                continue
+            train_loss, a, b = train_step(X_train, y_train, M, train_loss, a, b)
 
-            loss = np.mean(np.square(get_B(X_valid, M, b) @ a - y_valid))
-            if loss < min_loss:
-                min_loss = loss
-                min_M = M
-                min_a = a
-                min_b = b
+        test_loss = np.mean((predict(X_test, M, a, b) - y_test) ** 2)
+        if test_loss < min_loss:
+            min_loss = test_loss
+            min_M = M
+            min_a = a
+            min_b = b
 
-    print("valid mse loss :", min_loss)
-    print('min M :', min_M)
-    print('fail rate :', fail / (success + fail))
+    print('test loss:', min_loss)
     return min_M, min_a, min_b
 
 
-def test(X_test, y_test, M, a, b):
-    B = get_B(X_test, M, b)
-    losses = np.square(B @ a - y_test)
-    print('\ntest loss:\t', np.mean(losses))
+def validation(X_valid, y_valid, M, a, b):
+    loss = np.mean((predict(X_valid, M, a, b) - y_valid) ** 2)
+    print('\nvalid loss:\t', loss)
 
 
 def main():
-    (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = Dataset.load_dataset()
+    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
 
-    M, a, b = train(X_train, y_train, X_valid, y_valid)
-    test(X_test, y_test, M, a, b)
+    M, a, b = train(X_train, y_train, X_test, y_test)
+    validation(X_valid, y_valid, M, a, b)
 
 
 main()
