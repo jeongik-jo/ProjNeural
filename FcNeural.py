@@ -9,7 +9,7 @@ import numpy as np
 depth = 3
 learning_rate = 1e-3
 unit_sizes = [3, 6, 9, 12, 15]
-epoch = 10000
+epoch = 1000
 
 
 def build_model(units):
@@ -20,12 +20,7 @@ def build_model(units):
     return kr.Model(model_input, model_output)
 
 
-def train(X_train, y_train, X_valid, y_valid):
-    X_train = tf.cast(X_train, 'float32')
-    y_train = tf.cast(y_train, 'float32')
-    X_valid = tf.cast(X_valid, 'float32')
-    y_valid = tf.cast(y_valid, 'float32')
-
+def train(X_train, y_train, X_test, y_test):
     min_loss = np.inf
     min_model = None
     min_units = None
@@ -45,30 +40,34 @@ def train(X_train, y_train, X_valid, y_valid):
         for _ in range(epoch):
             train_step(model, optimizer, X_train, y_train)
 
-        loss = tf.reduce_mean(tf.square(model(X_valid) - y_valid))
+        test_loss = tf.reduce_mean(tf.square(model(X_test) - y_test))
 
-        if loss < min_loss:
-            min_loss = loss
+        if test_loss < min_loss:
+            min_loss = test_loss
             min_model = model
             min_units = units
-    print('valid loss:', min_loss.numpy())
+    print('test loss:', min_loss.numpy())
     print('units:', min_units)
 
     return min_model
 
 
-def test(model, X_test, y_test):
-    X_test = tf.cast(X_test, 'float32')
-    y_test = tf.cast(y_test, 'float32')
-
-    losses = tf.square(model(X_test) - y_test)
-    print('\ntest loss:\t', np.mean(losses))
+def validation(model, X_valid, y_valid):
+    loss = tf.reduce_mean(tf.square(model(X_valid) - y_valid))
+    print('\ntest loss:\t', loss.numpy())
 
 
 def main():
-    (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = Dataset.load_dataset()
-    model = train(X_train, y_train, X_valid, y_valid)
-    test(model, X_test, y_test)
+    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
+    X_train = tf.cast(X_train, 'float32')
+    y_train = tf.cast(y_train, 'float32')
+    X_test = tf.cast(X_test, 'float32')
+    y_test = tf.cast(y_test, 'float32')
+    X_valid = tf.cast(X_valid, 'float32')
+    y_valid = tf.cast(y_valid, 'float32')
+
+    model = train(X_train, y_train, X_test, y_test)
+    validation(model, X_valid, y_valid)
 
 
 main()

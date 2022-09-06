@@ -6,7 +6,7 @@ import Dataset
 neighbor_sizes = [1, 2, 3, 4, 8, 12, 16, 20]
 
 
-def train(X_train, y_train, X_valid, y_valid):
+def train(X_train, y_train, X_test, y_test):
     min_loss = np.inf
     min_model = None
     min_n_neighbors = None
@@ -14,10 +14,10 @@ def train(X_train, y_train, X_valid, y_valid):
     for n_neighbors in neighbor_sizes:
         model = KNeighborsRegressor(n_neighbors=n_neighbors)
         model.fit(X_train, y_train)
-        loss = np.mean(np.square(model.predict(X_valid) - y_valid))
+        test_loss = np.mean(np.square(model.predict(X_test) - y_test))
 
-        if loss < min_loss:
-            min_loss = loss
+        if test_loss < min_loss:
+            min_loss = test_loss
             min_model = model
             min_n_neighbors = n_neighbors
 
@@ -27,14 +27,15 @@ def train(X_train, y_train, X_valid, y_valid):
     return min_model
 
 
-def test(model, X_test, y_test):
-    losses = np.square(model.predict(X_test) - y_test)
-    print('\ntest loss:\t', np.mean(losses))
+def validation(model, X_valid, y_valid):
+    loss = np.mean(np.square(model.predict(X_valid) - y_valid))
+    print('\ntest loss:\t', loss)
 
 
 def main():
-    (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = Dataset.load_dataset()
-    model = train(X_train, y_train, X_valid, y_valid)
-    test(model, X_test, y_test)
+    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
+    model = train(X_train, y_train, X_test, y_test)
+    validation(model, X_valid, y_valid)
+
 
 main()
