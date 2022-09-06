@@ -11,7 +11,7 @@ is_m2 = True
 is_m3 = False
 is_m4 = False
 
-normalize_m = True
+normalize_m = False
 
 
 if is_m1:

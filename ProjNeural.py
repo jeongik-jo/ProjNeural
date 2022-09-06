@@ -8,7 +8,7 @@ R = 10 ** 6
 r = 4
 Ms = [2, 4, 8, 16]
 
-I_n = 400
+I_n = 10
 d = Dataset.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
 c_3 = 1
