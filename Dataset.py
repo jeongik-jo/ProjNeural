@@ -4,7 +4,7 @@ train_data_size = 80
 test_data_size = 20
 valid_data_size = 10000
 
-noise_strength = 0.0
+noise_strength = 0.05
 
 is_m1 = False
 is_m2 = True

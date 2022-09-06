@@ -10,7 +10,7 @@ import time
 depth = 3
 learning_rate = 1e-3
 unit_sizes = [3, 6, 9, 12, 15]
-epoch = 10000
+epoch = 100000
 
 
 def build_model(units):
