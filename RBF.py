@@ -1,6 +1,7 @@
 from scipy.interpolate import RBFInterpolator
 import numpy as np
 import Dataset
+import time
 
 kernel_names = ['cubic', 'linear', 'quintic', 'thin_plate_spline']
 
@@ -32,7 +33,11 @@ def validation(model, X_valid, y_valid):
 
 def main():
     (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
+    
+    start = time.time()
     model = train(X_train, y_train, X_test, y_test)
+    print('train time: ', time.time() - start, '\n')
+
     validation(model, X_valid, y_valid)
 
 

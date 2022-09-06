@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import product
 import Dataset
+import time
 
 A = 1
 N = 2
@@ -8,7 +9,7 @@ R = 10 ** 6
 r = 4
 Ms = [2, 4, 8, 16]
 
-I_n = 10
+I_n = 400
 d = Dataset.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
 c_3 = 1
@@ -111,8 +112,9 @@ def validation(X_valid, y_valid, M, a, b):
 
 def main():
     (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
-
+    start = time.time()
     M, a, b = train(X_train, y_train, X_test, y_test)
+    print('train time: ', time.time() - start, '\n')
     validation(X_valid, y_valid, M, a, b)
 
 

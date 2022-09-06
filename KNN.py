@@ -1,7 +1,7 @@
 from sklearn.neighbors import KNeighborsRegressor
 import numpy as np
 import Dataset
-
+import time
 
 neighbor_sizes = [1, 2, 3, 4, 8, 12, 16, 20]
 
@@ -34,7 +34,11 @@ def validation(model, X_valid, y_valid):
 
 def main():
     (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
+
+    start = time.time()
     model = train(X_train, y_train, X_test, y_test)
+    print('train time: ', time.time() - start, '\n')
+
     validation(model, X_valid, y_valid)
 
 
