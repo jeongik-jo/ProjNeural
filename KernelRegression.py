@@ -1,7 +1,10 @@
 from statsmodels.nonparametric.kernel_regression import KernelReg
 import numpy as np
 import Dataset
+import time
 
+
+repeat_time = 10
 
 def train(X_train, y_train, X_test, y_test):
     model = KernelReg(y_train, X_train, var_type='c', reg_type='lc')
@@ -21,4 +24,4 @@ def main():
     validation(model, X_valid, y_valid)
 
 
-main()
+#main()

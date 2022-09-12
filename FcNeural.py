@@ -6,18 +6,40 @@ import Dataset
 import numpy as np
 import time
 
-
 depth = 3
 learning_rate = 1e-3
 unit_sizes = [3, 6, 9, 12, 15]
-epoch = 100000
+epoch = 10000
+
+
+class EqDense(kr.layers.Layer):
+    def __init__(self, units, activation=kr.activations.linear, use_bias=True, lr_scale=1.0):
+        super(EqDense, self).__init__()
+        self.units = units
+        self.activation = activation
+        self.use_bias = use_bias
+        self.lr_scale = lr_scale
+
+    def build(self, input_shape):
+        self.w = tf.Variable(tf.random.normal([input_shape[-1], self.units]) / self.lr_scale, name=self.name + '_w')
+        self.he_std = tf.sqrt(1.0 / tf.cast(input_shape[-1], 'float32')) * self.lr_scale
+
+        if self.use_bias:
+            self.b = tf.Variable(tf.zeros([1, self.units]), name=self.name + '_b')
+
+    def call(self, inputs, *args, **kwargs):
+        feature_vector = tf.matmul(inputs, self.w) * self.he_std
+        if self.use_bias:
+            feature_vector = feature_vector + self.b
+
+        return self.activation(feature_vector)
 
 
 def build_model(units):
     model_output = model_input = kr.Input([Dataset.input_dim])
     for _ in range(depth):
-        model_output = kr.layers.Dense(units=units, activation=tf.nn.leaky_relu)(model_output)
-    model_output = tf.squeeze(kr.layers.Dense(units=1)(model_output))
+        model_output = EqDense(units=units, activation=tf.nn.swish)(model_output)
+    model_output = tf.squeeze(EqDense(units=1)(model_output))
     return kr.Model(model_input, model_output)
 
 
@@ -47,15 +69,16 @@ def train(X_train, y_train, X_test, y_test):
             min_loss = test_loss
             min_model = model
             min_units = units
-    print('test loss:', min_loss.numpy())
-    print('units:', min_units)
+    print('test loss:\t', min_loss.numpy())
+    print('units:\t', min_units)
 
     return min_model
 
 
 def validation(model, X_valid, y_valid):
     loss = tf.reduce_mean(tf.square(model(X_valid) - y_valid))
-    print('\ntest loss:\t', loss.numpy())
+    print('valid loss:\t', loss.numpy())
+    return loss
 
 
 def main():
@@ -70,9 +93,6 @@ def main():
 
     start = time.time()
     model = train(X_train, y_train, X_test, y_test)
-    print('train time: ', time.time() - start, '\n')
+    print('train time:\t', time.time() - start)
 
-    validation(model, X_valid, y_valid)
-
-
-main()
+    return validation(model, X_valid, y_valid)

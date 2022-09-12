@@ -9,7 +9,7 @@ R = 10 ** 6
 r = 4
 Ms = [2, 4, 8, 16]
 
-I_n = 400
+I_n = 4
 d = Dataset.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
 c_3 = 1
@@ -101,21 +101,20 @@ def train(X_train, y_train, X_test, y_test):
             min_a = a
             min_b = b
 
-    print('test loss:', min_loss)
+    print('test loss:\t', min_loss)
+    print('min M:\t', min_M)
     return min_M, min_a, min_b
 
 
 def validation(X_valid, y_valid, M, a, b):
     loss = np.mean((predict(X_valid, M, a, b) - y_valid) ** 2)
-    print('\nvalid loss:\t', loss)
+    print('valid loss:\t', loss)
+    return loss
 
 
 def main():
     (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
     start = time.time()
     M, a, b = train(X_train, y_train, X_test, y_test)
-    print('train time: ', time.time() - start, '\n')
-    validation(X_valid, y_valid, M, a, b)
-
-
-main()
+    print('train time:\t', time.time() - start)
+    return validation(X_valid, y_valid, M, a, b)

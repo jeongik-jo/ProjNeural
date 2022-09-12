@@ -41,4 +41,4 @@ def main():
     validation(model, X_valid, y_valid)
 
 
-main()
+#main()

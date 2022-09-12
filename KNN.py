@@ -39,7 +39,4 @@ def main():
     model = train(X_train, y_train, X_test, y_test)
     print('train time: ', time.time() - start, '\n')
 
-    validation(model, X_valid, y_valid)
-
-
-main()
+    return validation(model, X_valid, y_valid)
