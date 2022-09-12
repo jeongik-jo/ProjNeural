@@ -9,7 +9,7 @@ R = 10 ** 6
 r = 4
 Ms = [2, 4, 8, 16]
 
-I_n = 4
+I_n = 400
 d = Dataset.input_dim
 s = np.ceil(np.log2(N + 1))  # 2
 c_3 = 1
@@ -118,3 +118,7 @@ def main():
     M, a, b = train(X_train, y_train, X_test, y_test)
     print('train time:\t', time.time() - start)
     return validation(X_valid, y_valid, M, a, b)
+
+
+if __name__ == "__main__":
+    main()

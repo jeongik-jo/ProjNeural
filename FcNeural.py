@@ -6,10 +6,10 @@ import Dataset
 import numpy as np
 import time
 
-depth = 3
+depth = 5
 learning_rate = 1e-3
 unit_sizes = [3, 6, 9, 12, 15]
-epoch = 10000
+epoch = 100000
 
 
 class EqDense(kr.layers.Layer):
@@ -38,7 +38,7 @@ class EqDense(kr.layers.Layer):
 def build_model(units):
     model_output = model_input = kr.Input([Dataset.input_dim])
     for _ in range(depth):
-        model_output = EqDense(units=units, activation=tf.nn.swish)(model_output)
+        model_output = EqDense(units=units, activation=tf.nn.sigmoid)(model_output)
     model_output = tf.squeeze(EqDense(units=1)(model_output))
     return kr.Model(model_input, model_output)
 
@@ -96,3 +96,7 @@ def main():
     print('train time:\t', time.time() - start)
 
     return validation(model, X_valid, y_valid)
+
+
+if __name__ == "__main__":
+    main()

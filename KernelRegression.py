@@ -24,4 +24,5 @@ def main():
     validation(model, X_valid, y_valid)
 
 
-#main()
+if __name__ == "__main__":
+    main()

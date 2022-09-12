@@ -40,3 +40,7 @@ def main():
     print('train time: ', time.time() - start, '\n')
 
     return validation(model, X_valid, y_valid)
+
+
+if __name__ == "__main__":
+    main()
