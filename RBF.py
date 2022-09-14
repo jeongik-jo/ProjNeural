@@ -29,6 +29,7 @@ def train(X_train, y_train, X_test, y_test):
 def validation(model, X_valid, y_valid):
     loss = np.mean(np.square(model(X_valid) - y_valid))
     print('\nvalid loss:\t', loss)
+    return loss
 
 
 def main(i):
@@ -38,7 +39,7 @@ def main(i):
     model = train(X_train, y_train, X_test, y_test)
     print('train time: ', time.time() - start, '\n')
 
-    validation(model, X_valid, y_valid)
+    return validation(model, X_valid, y_valid)
 
 
 if __name__ == "__main__":

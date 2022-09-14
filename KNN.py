@@ -30,6 +30,7 @@ def train(X_train, y_train, X_test, y_test):
 def validation(model, X_valid, y_valid):
     loss = np.mean(np.square(model.predict(X_valid) - y_valid))
     print('\ntest loss:\t', loss)
+    return loss
 
 
 def main(i):

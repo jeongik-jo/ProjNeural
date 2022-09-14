@@ -8,8 +8,8 @@ from scipy.stats import iqr
 import numpy as np
 
 
-repeat_time = 50
-repeat_func = ProjNeural.main
+repeat_time = 2
+repeat_func = FcNeural.main
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     print('\nmedian:\t', np.median(losses))
     print('iqr:\t', iqr(losses))
     print('mean:\t', np.mean(losses))
-    print('variance:\t', np.var(losses))
+    print('stddev:\t', np.std(losses, ddof=1))
     print('total time:\t', time.time() - start)
 
 
