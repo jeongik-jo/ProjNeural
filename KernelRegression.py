@@ -17,12 +17,12 @@ def validation(model, X_valid, y_valid):
     print('\ntest loss:\t', loss.numpy())
 
 
-def main():
-    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
+def main(i):
+    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset(i)
 
     model = train(X_train, y_train, X_test, y_test)
     validation(model, X_valid, y_valid)
 
 
 if __name__ == "__main__":
-    main()
+    main(0)

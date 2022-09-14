@@ -32,8 +32,8 @@ def validation(model, X_valid, y_valid):
     print('\ntest loss:\t', loss)
 
 
-def main():
-    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
+def main(i):
+    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset(i)
 
     start = time.time()
     model = train(X_train, y_train, X_test, y_test)
@@ -43,4 +43,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(0)
