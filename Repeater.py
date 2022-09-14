@@ -1,5 +1,5 @@
 import FcNeural
-#import KernelRegression
+import KernelRegression
 import KNN
 import ProjNeural
 import RBF
@@ -10,7 +10,7 @@ import numpy as np
 
 
 repeat_time = 50
-repeat_func = MARS.main
+repeat_func = KernelRegression.main
 
 
 def main():

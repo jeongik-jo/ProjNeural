@@ -21,7 +21,7 @@ def train(X_train, y_train, X_test, y_test):
             min_model = model
             min_n_neighbors = n_neighbors
 
-    print('valid loss:', min_loss)
+    print('test loss:', min_loss)
     print('neighbors:', min_n_neighbors)
 
     return min_model
@@ -29,7 +29,7 @@ def train(X_train, y_train, X_test, y_test):
 
 def validation(model, X_valid, y_valid):
     loss = np.mean(np.square(model.predict(X_valid) - y_valid))
-    print('\ntest loss:\t', loss)
+    print('\nvalid loss:\t', loss)
     return loss
 
 
