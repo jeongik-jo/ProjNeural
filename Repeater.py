@@ -3,13 +3,14 @@ import FcNeural
 import KNN
 import ProjNeural
 import RBF
+import MARS
 import time
 from scipy.stats import iqr
 import numpy as np
 
 
-repeat_time = 2
-repeat_func = FcNeural.main
+repeat_time = 50
+repeat_func = MARS.main
 
 
 def main():
