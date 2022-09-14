@@ -22,6 +22,10 @@ def main():
 
     print('\nmedian:\t', np.median(losses))
     print('iqr:\t', iqr(losses))
+    print('mean:\t', np.mean(losses))
+    print('variance:\t', np.var(losses))
     print('total time:\t', time.time() - start)
 
-main()
+
+if __name__ == "__main__":
+    main()
