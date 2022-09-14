@@ -11,8 +11,8 @@ def train(X_train, y_train, X_test, y_test):
 
 
 def validation(model, X_valid, y_valid):
-    loss = np.mean((model(X_valid) - y_valid) ** 2)
-    print('\ntest loss:\t', loss.numpy())
+    loss = np.mean((model.fit([X_valid[:, i] for i in range(X_valid.shape[1])])[0] - y_valid) ** 2)
+    print('\ntest loss:\t', loss)
     return loss
 
 
