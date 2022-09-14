@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 train_data_size = 80
 test_data_size = 20
@@ -44,14 +45,38 @@ elif is_m4:
     noise_scale = 3.71
 
 
-def load_dataset():
-    X_train = np.random.uniform(-1, 1, size=[train_data_size, input_dim])
-    y_train = m(X_train) + noise_strength * noise_scale * np.random.normal(size=[train_data_size])
+def save_dataset():
+    if not os.path.exists('datasets'):
+        os.makedirs('datasets')
 
-    X_test = np.random.uniform(-1, 1, size=[test_data_size, input_dim])
-    y_test = m(X_test) + noise_strength * noise_scale * np.random.normal(size=[test_data_size])
+    for i in range(50):
+        X_train = np.random.uniform(-1, 1, size=[train_data_size, input_dim])
+        y_train = m(X_train) + noise_strength * noise_scale * np.random.normal(size=[train_data_size])
 
-    X_valid = np.random.uniform(-1, 1, size=[valid_data_size, input_dim])
-    y_valid = m(X_valid)
+        X_test = np.random.uniform(-1, 1, size=[test_data_size, input_dim])
+        y_test = m(X_test) + noise_strength * noise_scale * np.random.normal(size=[test_data_size])
+
+        X_valid = np.random.uniform(-1, 1, size=[valid_data_size, input_dim])
+        y_valid = m(X_valid)
+
+        np.save('datasets/X_train_%d.npy' % i, X_train)
+        np.save('datasets/y_train_%d.npy' % i, y_train)
+        np.save('datasets/X_test_%d.npy' % i, X_test)
+        np.save('datasets/y_test_%d.npy' % i, y_test)
+        np.save('datasets/X_valid_%d.npy' % i, X_valid)
+        np.save('datasets/y_valid_%d.npy' % i, y_valid)
+
+
+def load_dataset(i):
+    X_train = np.load('datasets/X_train_%d.npy' % i)
+    y_train = np.load('datasets/y_train_%d.npy' % i)
+    X_test = np.load('datasets/X_test_%d.npy' % i)
+    y_test = np.load('datasets/y_test_%d.npy' % i)
+    X_valid = np.load('datasets/X_valid_%d.npy' % i)
+    y_valid = np.load('datasets/y_valid_%d.npy' % i)
 
     return (X_train, y_train), (X_test, y_test), (X_valid, y_valid)
+
+
+if __name__ == "__main__":
+    save_dataset()

@@ -8,8 +8,8 @@ from scipy.stats import iqr
 import numpy as np
 
 
-repeat_time = 1
-repeat_func = FcNeural.main
+repeat_time = 50
+repeat_func = ProjNeural.main
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     losses = []
     for i in range(repeat_time):
         print('repeat %d' % i)
-        losses.append(repeat_func())
+        losses.append(repeat_func(i))
         print()
 
     print('\nmedian:\t', np.median(losses))

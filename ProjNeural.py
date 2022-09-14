@@ -44,20 +44,18 @@ def get_B(X, M, b):
     for l in np.arange(1, r + 1):
         for k in np.arange(1, M + 2):
             for j in product(np.arange(0, N + 1), repeat=d):
-                def f_down_up(x, down, up):
-                    if (0 <= up <= s - 1) and (1 <= down <= 2 ** up):
-                        return f_mult(f_down_up(x, 2 * down - 1, up + 1), f_down_up(x, 2 * down, up + 1))
-                    if up == s:
-                        for t in np.arange(1, d + 1):
-                            if np.sum(j[:t - 1]) + 1 <= down <= np.sum(j[:t]):
-                                return f_id(f_id(x[:, t - 1]))
-                        if down == np.sum(j) + 1:
-                            return f_hat(x @ b[l - 1], u[k - 1])
-                        if np.sum(j) + 2 <= down <= 2 ** s:
-                            return np.ones(shape=[x.shape[0]])
-                    raise AssertionError
-
                 if 0 <= np.sum(j) <= N:
+                    def f_down_up(x, down, up):
+                        if 0 <= up <= s - 1:
+                            return f_mult(f_down_up(x, 2 * down - 1, up + 1), f_down_up(x, 2 * down, up + 1))
+                        else:
+                            for t in np.arange(1, d + 1):
+                                if np.sum(j[:t - 1]) + 1 <= down <= np.sum(j[:t]):
+                                    return f_id(f_id(x[:, t - 1]))
+                            if down == np.sum(j) + 1:
+                                return f_hat(x @ b[l - 1], u[k - 1])
+                            else:
+                                return np.ones(shape=[x.shape[0]])
                     B.append(f_down_up(X, 1, 0))
     B = np.array(B).T
 
@@ -112,8 +110,8 @@ def validation(X_valid, y_valid, M, a, b):
     return loss
 
 
-def main():
-    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset()
+def main(i):
+    (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset(i)
     start = time.time()
     M, a, b = train(X_train, y_train, X_test, y_test)
     print('train time:\t', time.time() - start)
@@ -121,4 +119,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(0)
