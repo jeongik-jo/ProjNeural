@@ -10,7 +10,7 @@ import numpy as np
 
 
 repeat_time = 50
-repeat_func = KernelRegression.main
+repeat_func = RBF.main
 
 
 def main():

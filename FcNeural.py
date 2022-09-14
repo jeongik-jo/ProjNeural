@@ -6,9 +6,9 @@ import Dataset
 import numpy as np
 import time
 
-depths = [3, 5, 7]
-learning_rate = 1e-4
-unit_sizes = [4, 8, 16]
+depths = [6]
+learning_rates = [1e-4, 3e-4, 1e-3, 3e-3]
+unit_sizes = [2, 4, 6, 8, 10]
 epoch = 100000
 activation = tf.nn.leaky_relu
 
@@ -51,31 +51,34 @@ def train(X_train, y_train, X_test, y_test):
 
     for depth in depths:
         for units in unit_sizes:
-            @tf.function
-            def train_step(model, optimizer, X_train, y_train):
-                with tf.GradientTape() as tape:
-                    y_pred = model(X_train)
-                    loss = tf.reduce_mean(tf.square(y_pred - y_train))
-                optimizer.apply_gradients(
-                    zip(tape.gradient(loss, model.trainable_variables),
-                        model.trainable_variables))
+            for learning_rate in learning_rates:
+                @tf.function
+                def train_step(model, optimizer, X_train, y_train):
+                    with tf.GradientTape() as tape:
+                        y_pred = model(X_train)
+                        loss = tf.reduce_mean(tf.square(y_pred - y_train))
+                    optimizer.apply_gradients(
+                        zip(tape.gradient(loss, model.trainable_variables),
+                            model.trainable_variables))
 
-            model = build_model(depth, units)
-            optimizer = kr.optimizers.SGD(learning_rate=learning_rate)
-            for _ in range(epoch):
-                train_step(model, optimizer, X_train, y_train)
+                model = build_model(depth, units)
+                optimizer = kr.optimizers.SGD(learning_rate=learning_rate)
+                for _ in range(epoch):
+                    train_step(model, optimizer, X_train, y_train)
 
-            test_loss = tf.reduce_mean(tf.square(model(X_test) - y_test))
+                test_loss = tf.reduce_mean(tf.square(model(X_test) - y_test))
 
-            if test_loss < min_loss:
-                min_loss = test_loss
-                min_model = model
-                min_depth = depth
-                min_units = units
+                if test_loss < min_loss:
+                    min_loss = test_loss
+                    min_model = model
+                    min_depth = depth
+                    min_units = units
+                    min_learning_rate = learning_rate
 
     print('test loss:\t', min_loss.numpy())
     print('depth:\t', min_depth)
     print('units:\t', min_units)
+    print('learning rate:\t', min_learning_rate)
 
     return min_model
 
