@@ -10,7 +10,7 @@ import numpy as np
 
 
 repeat_time = 50
-repeat_func = RBF.main
+repeat_func = FcNeural.main
 
 
 def main():

@@ -6,40 +6,25 @@ import Dataset
 import numpy as np
 import time
 
-depths = [6]
-learning_rates = [1e-4, 3e-4, 1e-3, 3e-3]
-unit_sizes = [2, 4, 6, 8, 10]
+depths = [2]
+learning_rates = [0.02]
+unit_sizes = [26]
 epoch = 100000
-activation = tf.nn.leaky_relu
-
-
-class EqDense(kr.layers.Layer):
-    def __init__(self, units, activation=kr.activations.linear, use_bias=True):
-        super(EqDense, self).__init__()
-        self.units = units
-        self.activation = activation
-        self.use_bias = use_bias
-
-    def build(self, input_shape):
-        self.w = tf.Variable(tf.random.normal([input_shape[-1], self.units]), name=self.name + '_w')
-        self.he_std = tf.sqrt(2.0 / tf.cast(input_shape[-1], 'float32'))
-
-        if self.use_bias:
-            self.b = tf.Variable(tf.zeros([1, self.units]), name=self.name + '_b')
-
-    def call(self, inputs, *args, **kwargs):
-        feature_vector = tf.matmul(inputs, self.w) * self.he_std
-        if self.use_bias:
-            feature_vector = feature_vector + self.b
-
-        return self.activation(feature_vector)
+activation = tf.nn.sigmoid
+reg_weight = 1e-6
 
 
 def build_model(depth, units):
     model_output = model_input = kr.Input([Dataset.input_dim])
     for _ in range(depth):
-        model_output = EqDense(units=units, activation=activation)(model_output)
-    model_output = tf.squeeze(EqDense(units=1)(model_output))
+        model_output = kr.layers.Dense(units=units, activation=activation,
+                                       kernel_regularizer=kr.regularizers.L2(reg_weight),
+                                       bias_regularizer=kr.regularizers.L2(reg_weight),
+                                       )(model_output)
+    model_output = tf.squeeze(kr.layers.Dense(units=1,
+                                              kernel_regularizer=kr.regularizers.L2(reg_weight),
+                                              bias_regularizer=kr.regularizers.L2(reg_weight),
+                                              )(model_output))
     return kr.Model(model_input, model_output)
 
 
