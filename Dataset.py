@@ -48,7 +48,7 @@ elif is_m4:
 def save_dataset():
     if not os.path.exists('datasets'):
         os.makedirs('datasets')
-
+    epsilons = []
     for i in range(50):
         X_train = np.random.uniform(-1, 1, size=[train_data_size, input_dim])
         y_train = m(X_train) + noise_strength * noise_scale * np.random.normal(size=[train_data_size])
@@ -65,6 +65,10 @@ def save_dataset():
         np.save('datasets/y_test_%d.npy' % i, y_test)
         np.save('datasets/X_valid_%d.npy' % i, X_valid)
         np.save('datasets/y_valid_%d.npy' % i, y_valid)
+
+        y_valid_noised = y_valid + noise_strength * noise_scale * np.random.normal(size=[valid_data_size])
+        epsilons.append(np.mean(np.square(np.mean(y_train) - y_valid_noised)))
+    np.savetxt('datasets/eps.txt', [np.median(epsilons)])
 
 
 def load_dataset(i):

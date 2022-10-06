@@ -6,9 +6,9 @@ import Dataset
 import numpy as np
 import time
 
-depths = [2]
+depths = [1]
 learning_rates = [0.02]
-unit_sizes = [26]
+unit_sizes = [5, 10, 25, 50, 75]
 epoch = 100000
 activation = tf.nn.sigmoid
 reg_weight = 1e-6
