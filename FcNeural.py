@@ -6,64 +6,50 @@ import Dataset
 import numpy as np
 import time
 
-depths = [1]
-learning_rates = [0.02]
+depth = 1
+learning_rate = 0.02
 unit_sizes = [5, 10, 25, 50, 75]
 epoch = 100000
 activation = tf.nn.sigmoid
-reg_weight = 1e-6
 
 
-def build_model(depth, units):
+def build_model(units):
     model_output = model_input = kr.Input([Dataset.input_dim])
     for _ in range(depth):
-        model_output = kr.layers.Dense(units=units, activation=activation,
-                                       kernel_regularizer=kr.regularizers.L2(reg_weight),
-                                       bias_regularizer=kr.regularizers.L2(reg_weight),
-                                       )(model_output)
-    model_output = tf.squeeze(kr.layers.Dense(units=1,
-                                              kernel_regularizer=kr.regularizers.L2(reg_weight),
-                                              bias_regularizer=kr.regularizers.L2(reg_weight),
-                                              )(model_output))
+        model_output = kr.layers.Dense(units=units, activation=activation)(model_output)
+    model_output = tf.squeeze(kr.layers.Dense(units=1)(model_output))
     return kr.Model(model_input, model_output)
 
 
 def train(X_train, y_train, X_test, y_test):
     min_loss = np.inf
     min_model = None
-    min_depth = None
     min_units = None
 
-    for depth in depths:
-        for units in unit_sizes:
-            for learning_rate in learning_rates:
-                @tf.function
-                def train_step(model, optimizer, X_train, y_train):
-                    with tf.GradientTape() as tape:
-                        y_pred = model(X_train)
-                        loss = tf.reduce_mean(tf.square(y_pred - y_train))
-                    optimizer.apply_gradients(
-                        zip(tape.gradient(loss, model.trainable_variables),
-                            model.trainable_variables))
+    for units in unit_sizes:
+        @tf.function
+        def train_step(model, optimizer, X_train, y_train):
+            with tf.GradientTape() as tape:
+                y_pred = model(X_train)
+                loss = tf.reduce_mean(tf.square(y_pred - y_train))
+            optimizer.apply_gradients(
+                zip(tape.gradient(loss, model.trainable_variables),
+                    model.trainable_variables))
 
-                model = build_model(depth, units)
-                optimizer = kr.optimizers.SGD(learning_rate=learning_rate)
-                for _ in range(epoch):
-                    train_step(model, optimizer, X_train, y_train)
+        model = build_model(units)
+        optimizer = kr.optimizers.SGD(learning_rate=learning_rate)
+        for _ in range(epoch):
+            train_step(model, optimizer, X_train, y_train)
 
-                test_loss = tf.reduce_mean(tf.square(model(X_test) - y_test))
+        test_loss = tf.reduce_mean(tf.square(model(X_test) - y_test))
 
-                if test_loss < min_loss:
-                    min_loss = test_loss
-                    min_model = model
-                    min_depth = depth
-                    min_units = units
-                    min_learning_rate = learning_rate
+        if test_loss < min_loss:
+            min_loss = test_loss
+            min_model = model
+            min_units = units
 
     print('test loss:\t', min_loss.numpy())
-    print('depth:\t', min_depth)
     print('units:\t', min_units)
-    print('learning rate:\t', min_learning_rate)
 
     return min_model
 
