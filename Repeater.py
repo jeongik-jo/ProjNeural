@@ -11,6 +11,7 @@ import numpy as np
 
 repeat_time = 50
 repeat_func = FcNeural.main
+method_name = 'FcNeural' + str(FcNeural.depth)
 
 
 def main():
@@ -21,12 +22,12 @@ def main():
         losses.append(repeat_func(i))
         print()
 
-    print('\nmedian:\t', np.median(losses))
-    print('iqr:\t', iqr(losses))
-    print('mean:\t', np.mean(losses))
-    print('stddev:\t', np.std(losses, ddof=1))
-    print('total time:\t', time.time() - start)
-
+    with open(method_name + '.txt', 'w') as f:
+        f.write('\nmedian:\t' + str(np.median(losses)))
+        f.write('\niqr:\t' + str(iqr(losses)))
+        f.write('\nmean:\t' + str(np.mean(losses)))
+        f.write('\nstddev:\t' + str(np.std(losses, ddof=1)))
+        f.write('\ntotal time:\t' + str(time.time() - start))
 
 if __name__ == "__main__":
     main()
