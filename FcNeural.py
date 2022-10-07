@@ -6,14 +6,13 @@ import Dataset
 import numpy as np
 import time
 
-depth = 1
+
 learning_rate = 0.02
-unit_sizes = [5, 10, 25, 50, 75]
 epoch = 100000
 activation = tf.nn.sigmoid
 
 
-def build_model(units):
+def build_model(depth, units):
     model_output = model_input = kr.Input([Dataset.input_dim])
     for _ in range(depth):
         model_output = kr.layers.Dense(units=units, activation=activation)(model_output)
@@ -21,7 +20,16 @@ def build_model(units):
     return kr.Model(model_input, model_output)
 
 
-def train(X_train, y_train, X_test, y_test):
+def train(X_train, y_train, X_test, y_test, depth):
+    if depth == 1:
+        unit_sizes = [5, 10, 25, 50, 75]
+    elif depth == 3:
+        unit_sizes = [3, 6, 9, 12, 15]
+    elif depth == 6:
+        unit_sizes = [2, 4, 6, 8, 10]
+    else:
+        raise AssertionError
+
     min_loss = np.inf
     min_model = None
     min_units = None
@@ -36,7 +44,7 @@ def train(X_train, y_train, X_test, y_test):
                 zip(tape.gradient(loss, model.trainable_variables),
                     model.trainable_variables))
 
-        model = build_model(units)
+        model = build_model(depth, units)
         optimizer = kr.optimizers.SGD(learning_rate=learning_rate)
         for _ in range(epoch):
             train_step(model, optimizer, X_train, y_train)
@@ -60,7 +68,7 @@ def validation(model, X_valid, y_valid):
     return loss
 
 
-def main(i):
+def main(i, depth):
     (X_train, y_train), (X_test, y_test), (X_valid, y_valid) = Dataset.load_dataset(i)
 
     X_train = tf.cast(X_train, 'float32')
@@ -71,11 +79,11 @@ def main(i):
     y_valid = tf.cast(y_valid, 'float32')
 
     start = time.time()
-    model = train(X_train, y_train, X_test, y_test)
+    model = train(X_train, y_train, X_test, y_test, depth)
     print('train time:\t', time.time() - start)
 
     return validation(model, X_valid, y_valid)
 
 
 if __name__ == "__main__":
-    main(0)
+    main(0, 1)

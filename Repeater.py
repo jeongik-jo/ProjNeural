@@ -1,17 +1,45 @@
 import FcNeural
 import KernelRegression
 import KNN
-import ProjNeural
 import RBF
 import MARS
+import ProjNeural
 import time
 from scipy.stats import iqr
 import numpy as np
 
 
+is_fcneural = True
+if is_fcneural:
+    depth = 1
+is_kernel = False
+is_knn = False
+is_mars = False
+is_projneural = False
+is_rbf = False
+
 repeat_time = 50
-repeat_func = FcNeural.main
-method_name = 'FcNeural' + str(FcNeural.depth)
+if is_fcneural:
+    repeat_func = FcNeural.main
+    method_name = 'FcNeural' + str(depth)
+elif is_kernel:
+    repeat_func = KernelRegression.main
+    method_name = 'Kernel'
+elif is_knn:
+    repeat_func = KNN.main
+    method_name = 'KNN'
+elif is_mars:
+    repeat_func = MARS.main
+    method_name = 'MARS'
+elif is_projneural:
+    repeat_func = ProjNeural.main
+    method_name = 'ProjNeural'
+elif is_rbf:
+    repeat_func = RBF.main
+    method_name = 'RBF'
+else:
+    raise AssertionError
+
 
 
 def main():
@@ -19,7 +47,11 @@ def main():
     losses = []
     for i in range(repeat_time):
         print('repeat %d' % i)
-        losses.append(repeat_func(i))
+        if is_fcneural:
+            loss = repeat_func(i, depth)
+        else:
+            loss = repeat_func(i)
+        losses.append(loss)
         print()
 
     with open(method_name + '.txt', 'w') as f:
