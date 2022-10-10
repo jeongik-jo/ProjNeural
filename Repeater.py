@@ -41,7 +41,6 @@ else:
     raise AssertionError
 
 
-
 def main():
     start = time.time()
     losses = []
