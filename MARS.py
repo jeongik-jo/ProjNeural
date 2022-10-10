@@ -7,7 +7,6 @@ import pyearth
 def train(X_train, y_train, X_test, y_test):
     min_loss = np.inf
     min_model = None
-    min_kernel_name = None
 
     for _ in range(5):
         model = pyearth.Earth()
@@ -20,7 +19,6 @@ def train(X_train, y_train, X_test, y_test):
             min_model = model
 
     print('test loss:', min_loss)
-    print('kernel_name:', min_kernel_name)
 
     return min_model
 
