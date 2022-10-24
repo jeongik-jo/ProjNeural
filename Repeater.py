@@ -7,6 +7,9 @@ import ProjNeural
 import time
 from scipy.stats import iqr
 import numpy as np
+import csv
+import Dataset
+import os
 
 
 is_fcneural = True
@@ -52,13 +55,16 @@ def main():
             loss = repeat_func(i)
         losses.append(loss)
         print()
+    if not os.path.exists('results'):
+        os.makedirs('results')
+    with open('results/' +
+              str(Dataset.train_data_size + Dataset.test_data_size) + '_samples_' +
+              str(Dataset.noise_strength) + '_noise_' +
+              method_name + '.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['median', 'iqr', 'mean', 'stddev', 'total time'])
+        writer.writerow([np.median(losses), iqr(losses), np.mean(losses), np.std(losses, ddof=1), time.time() - start])
 
-    with open(method_name + '.txt', 'w') as f:
-        f.write('\nmedian:\t' + str(np.median(losses)))
-        f.write('\niqr:\t' + str(iqr(losses)))
-        f.write('\nmean:\t' + str(np.mean(losses)))
-        f.write('\nstddev:\t' + str(np.std(losses, ddof=1)))
-        f.write('\ntotal time:\t' + str(time.time() - start))
 
 if __name__ == "__main__":
     main()
