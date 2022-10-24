@@ -57,7 +57,19 @@ def main():
         print()
     if not os.path.exists('results'):
         os.makedirs('results')
-    with open('results/' +
+
+    if Dataset.is_m1:
+        f_name = 'm1'
+    elif Dataset.is_m2:
+        f_name = 'm2'
+    elif Dataset.is_m3:
+        f_name = 'm3'
+    elif Dataset.is_m4:
+        f_name = 'm4'
+    elif Dataset.is_m5:
+        f_name = 'm5'
+
+    with open('results/' + f_name + '_' + 
               str(Dataset.train_data_size + Dataset.test_data_size) + '_samples_' +
               str(Dataset.noise_strength) + '_noise_' +
               method_name + '.csv', 'w', newline='') as f:
