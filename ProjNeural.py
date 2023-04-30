@@ -37,8 +37,8 @@ def get_B(X, M, b):
     u = -d * A + np.arange(0, M + 1) * 2 * d * A / M
 
     def f_hat(x, y):
-        return f_relu(M / (2 * np.sqrt(d) * A) * (x - y) + 1) - 2 * f_relu(M / (2 * np.sqrt(d) * A) * (x - y)) + \
-               f_relu(M / (2 * np.sqrt(d) * A) * (x - y) - 1)
+        return f_relu(M / (2 * d * A) * (x - y) + 1) - 2 * f_relu(M / (2 * d * A) * (x - y)) + \
+               f_relu(M / (2 * d * A) * (x - y) - 1)
 
     B = []
     for l in np.arange(1, r + 1):
